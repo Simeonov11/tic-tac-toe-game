@@ -5,7 +5,12 @@ import Log from "./components/Log";
 import { WINNING_COMBINATIONS } from "./winning-combinations";
 import GameOver from "./components/GameOver";
 
-const initialGameBoard = [
+const INITIAL_PLAYERS = {
+    'X': 'Player 1',
+    'O': 'Player 2'
+}
+
+const INITIAL_GAME_BOARD = [
     [null, null, null],
     [null, null, null],
     [null, null, null],
@@ -21,17 +26,8 @@ const deriveActivePlayer = (gameTurns) => {
     return currentPlayer;
 }
 
-function App() {
-    const [players, setPlayers] = useState({
-        'X': 'Player 1',
-        'O': 'Player 2'
-    });
-
-    const [gameTurns, setGameTurns] = useState([]);
-
-    const activePlayer = deriveActivePlayer(gameTurns);
-
-    let gameBoard = [...initialGameBoard.map(array => [...array])];
+const deriveGameBoard = (gameTurns) => {
+    let gameBoard = [...INITIAL_GAME_BOARD.map(array => [...array])];
 
     for (const turn of gameTurns) {
         const { square, player } = turn;
@@ -40,6 +36,10 @@ function App() {
         gameBoard[row][col] = player;
     }
 
+    return gameBoard;
+}
+
+const deriveWinner = (gameBoard, players) => {
     let winner;
 
     for (const combination of WINNING_COMBINATIONS) {
@@ -54,6 +54,20 @@ function App() {
             winner = players[firstSquareSymbol];
         }
     }
+
+    return winner;
+}
+
+function App() {
+    const [players, setPlayers] = useState(INITIAL_PLAYERS);
+
+    const [gameTurns, setGameTurns] = useState([]);
+
+    const activePlayer = deriveActivePlayer(gameTurns);
+
+    const gameBoard = deriveGameBoard(gameTurns);
+
+    const winner = deriveWinner(gameBoard, players);
 
     const hasDraw = gameTurns.length === 9 && !winner;
 
